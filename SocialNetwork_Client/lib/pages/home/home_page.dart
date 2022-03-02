@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network_client/blocs/auth_bloc/auth_bloc.dart';
 import 'package:social_network_client/blocs/nav_bloc/nav_bloc.dart';
+import 'package:social_network_client/pages/home/contact_page.dart';
 import 'package:social_network_client/pages/home/room_page.dart';
 import 'package:social_network_client/pages/home/search_page.dart';
 
@@ -69,7 +70,7 @@ class HomePage extends StatelessWidget {
           if (state.index == 0) {
             return const RoomPage();
           } else {
-            return const Center(child: Text("contact"));
+            return const ContactPage();
           }
         },
       ),
