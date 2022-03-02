@@ -17,25 +17,32 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchFieldChangedEvent>((event, emit) async {
       if (_debounce?.isActive ?? false) {
         _debounce!.cancel();
-      } else {
-        emit(SearchLoadingState());
       }
-      _debounce = Timer(const Duration(milliseconds: 500), () async {
-        final query = event.query;
-        try {
-          List<UserWithFriendstatus> users = await userRepo.searchUser(query);
-          add(SearchLoadedEvent(users));
-        } on RefreshTokenExpiredException catch (_) {
-          add(SearchErrorEvent("Token expired"));
-        } on Exception catch (e) {
-          add(SearchErrorEvent(e.toString()));
-        }
-      });
+      if (event.query.isNotEmpty) {
+        emit(SearchLoadingState());
+        _debounce = Timer(const Duration(milliseconds: 500), () async {
+          final query = event.query;
+          try {
+            List<UserWithFriendstatus> users = await userRepo.searchUser(query);
+            add(SearchLoadedEvent(users));
+          } on RefreshTokenExpiredException catch (_) {
+            add(SearchErrorEvent("Token expired"));
+          } on Exception catch (e) {
+            add(SearchErrorEvent(e.toString()));
+          }
+        });
+      }
     });
 
     on<SearchLoadedEvent>((event, emit) async {
       // await Future.delayed(const Duration(milliseconds: 500));
       emit(SearchLoaded(event.users));
     });
+
+    on<FriendRequestEvent>(
+      (event, emit) {
+        emit(FriendRequestSuccessState(event.userId));
+      },
+    );
   }
 }

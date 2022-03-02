@@ -28,3 +28,15 @@ class SearchErrorState extends SearchState {
   @override
   List<Object?> get props => [message];
 }
+
+abstract class AddFriendState extends SearchState {
+  final String userId;
+  AddFriendState(this.userId);
+}
+
+class FriendRequestSuccessState extends AddFriendState {
+  FriendRequestSuccessState(userId) : super(userId);
+
+  @override
+  List<Object?> get props => [userId];
+}

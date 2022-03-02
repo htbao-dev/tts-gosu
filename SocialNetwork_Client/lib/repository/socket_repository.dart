@@ -14,11 +14,6 @@ class SocketRepository {
             .enableReconnection()
             .disableAutoConnect()
             .build());
-    _socket.onDisconnect((data) {
-      print(data);
-      // _socket.connect();
-    });
-    _socket.onReconnect((data) => print('reconnected'));
   }
 
   void connect() async {

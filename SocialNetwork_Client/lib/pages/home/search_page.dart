@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network_client/blocs/search_bloc/search_bloc.dart';
+import 'package:social_network_client/models/user.dart';
 import 'package:social_network_client/repository/user_repository.dart';
 
 class SearchPage extends StatelessWidget {
@@ -17,6 +18,8 @@ class SearchPage extends StatelessWidget {
         return Scaffold(
           appBar: _appBar(context),
           body: BlocBuilder<SearchBloc, SearchState>(
+            // buildWhen is used to test. Must implement buildWhen
+            buildWhen: (previous, current) => current is! AddFriendState,
             builder: (context, state) {
               if (state is SearchLoadingState) {
                 return const Center(
@@ -27,18 +30,7 @@ class SearchPage extends StatelessWidget {
                 var users = state.users;
                 return ListView.builder(
                   itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    var _userFriendStatus = users[index];
-                    return ListTile(
-                      // leading: CircleAvatar(
-                      //   backgroundImage: NetworkImage(user.avatarUrl),
-                      // ),
-                      title: Text(_userFriendStatus.user.name),
-                      trailing: _userFriendStatus.status != null
-                          ? const Text("Bạn bè")
-                          : const Text("Không bạn bè"),
-                    );
-                  },
+                  itemBuilder: (context, index) => _listViewTile(users[index]),
                 );
               }
               return Container();
@@ -46,6 +38,44 @@ class SearchPage extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+
+  Widget _listViewTile(UserWithFriendstatus item) {
+    return ListTile(
+        // leading: CircleAvatar(
+        //   backgroundImage: NetworkImage(user.avatarUrl),
+        // ),
+        title: Text(item.user.name),
+        trailing: _listViewTileTrailing(item.status, item.user.id));
+  }
+
+  Widget _listViewTileTrailing(int? status, String userId) {
+    return BlocBuilder<SearchBloc, SearchState>(
+      buildWhen: ((previous, current) =>
+          current is AddFriendState && current.userId == userId),
+      builder: (context, state) {
+        if (state is FriendRequestSuccessState) {
+          return TextButton.icon(
+              onPressed: () {
+                // BlocProvider.of<SearchBloc>(context)
+                //     .add(FriendRequestEvent(userId));
+              },
+              icon: const Icon(Icons.person_add_disabled),
+              label: const Text("Huỷ kết bạn"));
+        } else {
+          if (status != null) {
+            return Text("status $status");
+          }
+          return TextButton.icon(
+              onPressed: () {
+                BlocProvider.of<SearchBloc>(context)
+                    .add(FriendRequestEvent(userId));
+              },
+              icon: const Icon(Icons.person_add_alt),
+              label: const Text("Kết bạn"));
+        }
+      },
     );
   }
 

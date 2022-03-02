@@ -29,3 +29,12 @@ class SearchErrorEvent extends SearchEvent {
   @override
   List<Object> get props => [error];
 }
+
+class FriendRequestEvent extends SearchEvent {
+  final String userId;
+
+  FriendRequestEvent(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
