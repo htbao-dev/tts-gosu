@@ -15,47 +15,45 @@ class RoomPage extends StatelessWidget {
       create: (context) => RoomBloc(
         roomRepo: RepositoryProvider.of<RoomRepository>(context),
       ),
-      child: BlocListener<RoomBloc, RoomState>(
+      child: BlocConsumer<RoomBloc, RoomState>(
         listenWhen: (previous, current) => current is JoinRoomState,
+        buildWhen: (previous, current) => current is! JoinRoomState,
         listener: (context, state) {
           if (state is JoinRoomState) {
             Navigator.pushNamed(context, ChatPage.routeName,
                 arguments: state.room);
           }
         },
-        child: BlocBuilder<RoomBloc, RoomState>(
-          buildWhen: (previous, current) => current is! JoinRoomState,
-          builder: (context, state) {
-            if (state is RoomInitial) {
-              BlocProvider.of<RoomBloc>(context).add(GetListRoomEvent(""));
-            }
-            if (state is GetListRoomLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (state is GetListRoomLoaded) {
-              var rooms = state.listRoom;
-              return Row(children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: rooms.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        onTap: () {
-                          BlocProvider.of<RoomBloc>(context)
-                              .add(JoinRoomEvent(rooms[index]));
-                        },
-                        title: Text(rooms[index].name),
-                      );
-                    },
-                  ),
+        builder: (context, state) {
+          if (state is RoomInitial) {
+            BlocProvider.of<RoomBloc>(context).add(GetListRoomEvent(""));
+          }
+          if (state is GetListRoomLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is GetListRoomLoaded) {
+            var rooms = state.listRoom;
+            return Row(children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: rooms.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      onTap: () {
+                        BlocProvider.of<RoomBloc>(context)
+                            .add(JoinRoomEvent(rooms[index]));
+                      },
+                      title: Text(rooms[index].name),
+                    );
+                  },
                 ),
-              ]);
-            }
-            return Container();
-          },
-        ),
+              ),
+            ]);
+          }
+          return Container();
+        },
       ),
     );
   }
