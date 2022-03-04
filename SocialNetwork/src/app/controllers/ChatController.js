@@ -2,6 +2,7 @@ const Common = require("../common/Common");
 const multer = require("multer");
 const Room = require("../models/Room");
 const fs = require("fs");
+const Mongoose = require("mongoose");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
