@@ -28,7 +28,11 @@ class UserWithFriendstatus {
   UserWithFriendstatus({required this.user, this.status});
 
   factory UserWithFriendstatus.fromJson(Map<String, dynamic> json) {
-    User user = User.fromJson(json['user']);
+    User user = User.fromJson({
+      "id": json["id"] ?? json["_id"],
+      "name": json["name"],
+      "username": json["username"],
+    });
     return UserWithFriendstatus(user: user, status: json['status']);
   }
 }

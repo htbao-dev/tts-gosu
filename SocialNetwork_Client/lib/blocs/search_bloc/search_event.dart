@@ -30,11 +30,29 @@ class SearchErrorEvent extends SearchEvent {
   List<Object> get props => [error];
 }
 
-class FriendRequestEvent extends SearchEvent {
-  final String userId;
+abstract class FriendRequestEvent extends SearchEvent {
+  final String friendId;
 
-  FriendRequestEvent(this.userId);
+  FriendRequestEvent(this.friendId);
 
   @override
-  List<Object> get props => [userId];
+  List<Object> get props => [friendId];
+}
+
+class SendFriendRequestEvent extends FriendRequestEvent {
+  // final String friendId;
+
+  SendFriendRequestEvent(friendId) : super(friendId);
+
+  @override
+  List<Object> get props => [friendId];
+}
+
+class CancelFriendRequestEvent extends FriendRequestEvent {
+  // final String friendId;
+
+  CancelFriendRequestEvent(friendId) : super(friendId);
+
+  @override
+  List<Object> get props => [friendId];
 }

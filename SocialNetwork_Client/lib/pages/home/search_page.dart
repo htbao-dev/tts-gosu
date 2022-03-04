@@ -19,7 +19,7 @@ class SearchPage extends StatelessWidget {
           appBar: _appBar(context),
           body: BlocBuilder<SearchBloc, SearchState>(
             // buildWhen is used to test. Must implement buildWhen
-            buildWhen: (previous, current) => current is! AddFriendState,
+            buildWhen: (previous, current) => current is! FriendRequestState,
             builder: (context, state) {
               if (state is SearchLoadingState) {
                 return const Center(
@@ -28,9 +28,11 @@ class SearchPage extends StatelessWidget {
               }
               if (state is SearchLoaded) {
                 var users = state.users;
+                var myId = state.myId;
                 return ListView.builder(
                   itemCount: users.length,
-                  itemBuilder: (context, index) => _listViewTile(users[index]),
+                  itemBuilder: (context, index) =>
+                      _listViewTile(users[index], myId),
                 );
               }
               return Container();
@@ -38,44 +40,6 @@ class SearchPage extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-
-  Widget _listViewTile(UserWithFriendstatus item) {
-    return ListTile(
-        // leading: CircleAvatar(
-        //   backgroundImage: NetworkImage(user.avatarUrl),
-        // ),
-        title: Text(item.user.name),
-        trailing: _listViewTileTrailing(item.status, item.user.id));
-  }
-
-  Widget _listViewTileTrailing(int? status, String userId) {
-    return BlocBuilder<SearchBloc, SearchState>(
-      buildWhen: ((previous, current) =>
-          current is AddFriendState && current.userId == userId),
-      builder: (context, state) {
-        if (state is FriendRequestSuccessState) {
-          return TextButton.icon(
-              onPressed: () {
-                // BlocProvider.of<SearchBloc>(context)
-                //     .add(FriendRequestEvent(userId));
-              },
-              icon: const Icon(Icons.person_add_disabled),
-              label: const Text("Huỷ kết bạn"));
-        } else {
-          if (status != null) {
-            return Text("status $status");
-          }
-          return TextButton.icon(
-              onPressed: () {
-                BlocProvider.of<SearchBloc>(context)
-                    .add(FriendRequestEvent(userId));
-              },
-              icon: const Icon(Icons.person_add_alt),
-              label: const Text("Kết bạn"));
-        }
-      },
     );
   }
 
@@ -102,5 +66,68 @@ class SearchPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _listViewTile(UserWithFriendstatus item, String userId) {
+    return ListTile(
+        // leading: CircleAvatar(
+        //   backgroundImage: NetworkImage(user.avatarUrl),
+        // ),
+        title: Text(item.user.name),
+        subtitle: Text(item.user.username),
+        trailing: _listViewTileTrailing(item.status, item.user.id, userId));
+  }
+
+  Widget _listViewTileTrailing(int? status, String friendId, String userId) {
+    if (friendId == userId) {
+      return const SizedBox();
+    }
+    return BlocBuilder<SearchBloc, SearchState>(
+        buildWhen: ((previous, current) =>
+            current is FriendRequestState && current.friendId == friendId),
+        builder: (context, state) {
+          if (state is FriendRequestState) {
+            status = state.status;
+          }
+          if (status != null) {
+            switch (status) {
+              case 0:
+                return TextButton.icon(
+                    onPressed: () {
+                      BlocProvider.of<SearchBloc>(context)
+                          .add(CancelFriendRequestEvent(friendId));
+                    },
+                    icon: const Icon(Icons.person_add_disabled),
+                    label: const Text("Huỷ yêu cầu"));
+              case 1:
+                return TextButton.icon(
+                    onPressed: () {
+                      // BlocProvider.of<SearchBloc>(context)
+                      //     .add(FriendRequestEvent(friendId));
+                    },
+                    icon: const Icon(Icons.person_add_alt),
+                    label: const Text("Xác nhận"));
+              case 2:
+                return const Text("Bạn bè");
+              // return TextButton.icon(
+              //     onPressed: () {
+              //       // BlocProvider.of<SearchBloc>(context)
+              //       //     .add(FriendRequestEvent(friendId));
+              //     },
+              //     icon: const Icon(Icons.person_add_disabled),
+              //     label: const Text("Huỷ kết bạn"));
+              default:
+                return const SizedBox();
+            }
+          } else {
+            return TextButton.icon(
+                onPressed: () {
+                  BlocProvider.of<SearchBloc>(context)
+                      .add(SendFriendRequestEvent(friendId));
+                },
+                icon: const Icon(Icons.person_add_alt),
+                label: const Text("Kết bạn"));
+          }
+        });
   }
 }
