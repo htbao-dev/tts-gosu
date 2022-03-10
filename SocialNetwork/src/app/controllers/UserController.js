@@ -91,7 +91,6 @@ async function sendFriendRequest(req, res) {
 }
 
 async function acceptFriendRequest(req, res) {
-<<<<<<< HEAD
   const userId = req.userId;
   const friendId = req.body.friendId;
   let user = await User.findById(userId);
@@ -146,9 +145,6 @@ async function acceptFriendRequest(req, res) {
       res.status(200).json(friendRequestStatus.acceptFriendRequestSuccess);
     }
   }
-=======
-  console.log("acceptFriendRequest");
->>>>>>> 179db053fb341df5b2a5c156b5e3c7711ceebc86
 }
 
 async function rejectFriendRequest(req, res) {}
