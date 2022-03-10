@@ -90,7 +90,9 @@ async function sendFriendRequest(req, res) {
   res.status(200).json(friendRequestStatus.friendRequestSuccess);
 }
 
-async function acceptFriendRequest(req, res) {}
+async function acceptFriendRequest(req, res) {
+  console.log("acceptFriendRequest");
+}
 
 async function rejectFriendRequest(req, res) {}
 
