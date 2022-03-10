@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:social_network_client/models/User.dart';
 import 'package:social_network_client/models/room.dart';
+import 'package:social_network_client/models/user.dart';
 import 'package:social_network_client/repository/room_repository.dart';
 import 'package:social_network_client/repository/socket_repository.dart';
 import 'dart:core';
