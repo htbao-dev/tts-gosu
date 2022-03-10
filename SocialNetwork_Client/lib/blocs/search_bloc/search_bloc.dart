@@ -63,5 +63,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         emit(CancelFriendRequestSuccessState(event.friendId, null));
       },
     );
+
+    on<AcceptFriendRequestEvent>(((event, emit) async {
+      var requestStatus = await friendRepo.acceptFriendRequest(event.friendId);
+      if (requestStatus.errorCode == null) {
+        emit(AcceptFriendRequestSuccessState(event.friendId, 2));
+      } else {
+        print(requestStatus.message);
+        emit(AcceptFriendRequestErrorState(
+          event.friendId,
+          requestStatus.errorCode,
+        ));
+      }
+    }));
   }
 }

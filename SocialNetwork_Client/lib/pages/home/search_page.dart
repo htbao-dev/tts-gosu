@@ -78,7 +78,8 @@ class SearchPage extends StatelessWidget {
         trailing: _listViewTileTrailing(item.status, item.user.id, userId));
   }
 
-  Widget _listViewTileTrailing(int? status, String friendId, String userId) {
+  Widget _listViewTileTrailing(
+      int? friendStatus, String friendId, String userId) {
     if (friendId == userId) {
       return const SizedBox();
     }
@@ -87,10 +88,10 @@ class SearchPage extends StatelessWidget {
             current is FriendRequestState && current.friendId == friendId),
         builder: (context, state) {
           if (state is FriendRequestState) {
-            status = state.status;
+            friendStatus = state.friendStatus;
           }
-          if (status != null) {
-            switch (status) {
+          if (friendStatus != null) {
+            switch (friendStatus) {
               case 0:
                 return TextButton.icon(
                     onPressed: () {
@@ -102,8 +103,8 @@ class SearchPage extends StatelessWidget {
               case 1:
                 return TextButton.icon(
                     onPressed: () {
-                      // BlocProvider.of<SearchBloc>(context)
-                      //     .add(FriendRequestEvent(friendId));
+                      BlocProvider.of<SearchBloc>(context)
+                          .add(AcceptFriendRequestEvent(friendId));
                     },
                     icon: const Icon(Icons.person_add_alt),
                     label: const Text("Xác nhận"));

@@ -56,3 +56,12 @@ class CancelFriendRequestEvent extends FriendRequestEvent {
   @override
   List<Object> get props => [friendId];
 }
+
+class AcceptFriendRequestEvent extends FriendRequestEvent {
+  // final String friendId;
+
+  AcceptFriendRequestEvent(friendId) : super(friendId);
+
+  @override
+  List<Object> get props => [friendId];
+}

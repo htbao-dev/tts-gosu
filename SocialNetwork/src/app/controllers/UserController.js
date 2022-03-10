@@ -125,16 +125,24 @@ async function acceptFriendRequest(req, res) {
         .status(400)
         .json(friendRequestStatus.notFriendReqeustReceiverError);
     default: {
-      user.friends.findOneAndUpdate(
-        { user: friendId },
-        { $set: { status: 2 } }
+      await User.updateOne(
+        { _id: userId, "friends.user": friendId },
+        { $set: { "friends.$.status": 2 } }
       );
-      friend.friends.findOneAndUpdate(
-        { user: userId },
-        { $set: { status: 2 } }
+      await User.updateOne(
+        { _id: friendId, "friends.user": userId },
+        { $set: { "friends.$.status": 2 } }
       );
-      await user.save();
-      await friend.save();
+      // user.friends.findOneAndUpdate(
+      //   { user: friendId },
+      //   { $set: { status: 2 } }
+      // );
+      // friend.friends.findOneAndUpdate(
+      //   { user: userId },
+      //   { $set: { status: 2 } }
+      // );
+      // await user.save();
+      // await friend.save();
       const friendSocketId = friend.socketId;
       if (friendSocketId) {
         io.to(friendSocketId).emit("accept-friend-request", {

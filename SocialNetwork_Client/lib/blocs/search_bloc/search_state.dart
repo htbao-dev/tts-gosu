@@ -32,27 +32,58 @@ class SearchErrorState extends SearchState {
 
 abstract class FriendRequestState extends SearchState {
   final String friendId;
-  final int? status;
-  FriendRequestState(this.friendId, this.status);
+  final int? friendStatus;
+  FriendRequestState({required this.friendId, required this.friendStatus});
 }
 
 class SendFriendRequestSuccessState extends FriendRequestState {
-  SendFriendRequestSuccessState(friendId, status) : super(friendId, status);
+  SendFriendRequestSuccessState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
 
   @override
-  List<Object?> get props => [friendId, status];
+  List<Object?> get props => [friendId, friendStatus];
 }
 
 class SendFriendRequestErrorState extends FriendRequestState {
-  SendFriendRequestErrorState(friendId, status) : super(friendId, status);
+  SendFriendRequestErrorState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
 
   @override
-  List<Object?> get props => [friendId, status];
+  List<Object?> get props => [friendId, friendStatus];
 }
 
 class CancelFriendRequestSuccessState extends FriendRequestState {
-  CancelFriendRequestSuccessState(friendId, status) : super(friendId, status);
+  CancelFriendRequestSuccessState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
 
   @override
-  List<Object?> get props => [friendId, status];
+  List<Object?> get props => [friendId, friendStatus];
+}
+
+class AcceptFriendRequestSuccessState extends FriendRequestState {
+  AcceptFriendRequestSuccessState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
+}
+
+class AcceptFriendRequestErrorState extends FriendRequestState {
+  AcceptFriendRequestErrorState(String friendId, int? friendStatus)
+      : super(friendId: friendId, friendStatus: friendStatus);
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
 }
