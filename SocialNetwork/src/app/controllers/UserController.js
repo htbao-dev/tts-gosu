@@ -90,7 +90,62 @@ async function sendFriendRequest(req, res) {
   res.status(200).json(friendRequestStatus.friendRequestSuccess);
 }
 
-async function acceptFriendRequest(req, res) {}
+async function acceptFriendRequest(req, res) {
+  const userId = req.userId;
+  const friendId = req.body.friendId;
+  let user = await User.findById(userId);
+  let friend = await User.findById(friendId);
+  const _friend = checkExistsInListFriend(user.friends, friendId);
+  if (!_friend) {
+    return res
+      .status(400)
+      .json(friendRequestStatus.friendRequestNotExistsError);
+  }
+  switch (_friend.status) {
+    case 2:
+      return res.status(400).json(friendRequestStatus.alreadyFriendError);
+    case 0:
+      return res
+        .status(400)
+        .json(friendRequestStatus.notFriendReqeustReceiverError);
+    default:
+      break;
+  }
+  const _user = checkExistsInListFriend(friend.friends, userId);
+  if (!_user) {
+    user.friends.pull({ user: friendId });
+    await user.save();
+    return res
+      .status(400)
+      .json(friendRequestStatus.notFriendReqeustReceiverError);
+  }
+  switch (_user.status) {
+    case 1:
+      return res
+        .status(400)
+        .json(friendRequestStatus.notFriendReqeustReceiverError);
+    default: {
+      user.friends.findOneAndUpdate(
+        { user: friendId },
+        { $set: { status: 2 } }
+      );
+      friend.friends.findOneAndUpdate(
+        { user: userId },
+        { $set: { status: 2 } }
+      );
+      await user.save();
+      await friend.save();
+      const friendSocketId = friend.socketId;
+      if (friendSocketId) {
+        io.to(friendSocketId).emit("accept-friend-request", {
+          userId: userId,
+          name: user.name,
+        });
+      }
+      res.status(200).json(friendRequestStatus.acceptFriendRequestSuccess);
+    }
+  }
+}
 
 async function rejectFriendRequest(req, res) {}
 
