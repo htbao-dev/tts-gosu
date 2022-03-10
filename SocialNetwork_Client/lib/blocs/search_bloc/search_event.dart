@@ -40,8 +40,6 @@ abstract class FriendRequestEvent extends SearchEvent {
 }
 
 class SendFriendRequestEvent extends FriendRequestEvent {
-  // final String friendId;
-
   SendFriendRequestEvent(friendId) : super(friendId);
 
   @override
@@ -49,8 +47,6 @@ class SendFriendRequestEvent extends FriendRequestEvent {
 }
 
 class CancelFriendRequestEvent extends FriendRequestEvent {
-  // final String friendId;
-
   CancelFriendRequestEvent(friendId) : super(friendId);
 
   @override
@@ -58,9 +54,14 @@ class CancelFriendRequestEvent extends FriendRequestEvent {
 }
 
 class AcceptFriendRequestEvent extends FriendRequestEvent {
-  // final String friendId;
-
   AcceptFriendRequestEvent(friendId) : super(friendId);
+
+  @override
+  List<Object> get props => [friendId];
+}
+
+class RejectFriendRequestEvent extends FriendRequestEvent {
+  RejectFriendRequestEvent(friendId) : super(friendId);
 
   @override
   List<Object> get props => [friendId];

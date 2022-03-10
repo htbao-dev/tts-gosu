@@ -93,6 +93,35 @@ class FriendRepository {
       }
     }
   }
+
+  Future<FriendRequestStatus> rejectFriendRequest(String friendID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    final response = await http
+        .post(Uri.parse('$apiUrl/user/reject-friend-request'), headers: {
+      // 'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    }, body: {
+      'friendId': friendID,
+    });
+    if (response.statusCode == 403) {
+      final isOK = await _authRepo.refreshAccessToken();
+
+      if (isOK) {
+        return rejectFriendRequest(friendID);
+      } else {
+        throw RefreshTokenExpiredException("Refreshtoken expired");
+      }
+    } else {
+      try {
+        var body = json.decode(response.body);
+        FriendRequestStatus status = FriendRequestStatus.fromJson(body);
+        return status;
+      } catch (_) {
+        throw Exception(response.body);
+      }
+    }
+  }
 }
 
 class FriendRequestStatus {

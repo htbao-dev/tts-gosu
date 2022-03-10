@@ -64,7 +64,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       },
     );
 
-    on<AcceptFriendRequestEvent>(((event, emit) async {
+    on<AcceptFriendRequestEvent>((event, emit) async {
       var requestStatus = await friendRepo.acceptFriendRequest(event.friendId);
       if (requestStatus.errorCode == null) {
         emit(AcceptFriendRequestSuccessState(event.friendId, 2));
@@ -75,6 +75,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           requestStatus.errorCode,
         ));
       }
-    }));
+    });
+
+    on<RejectFriendRequestEvent>((event, emit) async {
+      var requestStatus = await friendRepo.rejectFriendRequest(event.friendId);
+      if (requestStatus.errorCode == null) {
+        emit(RejectFriendRequestSuccessState(event.friendId, null));
+      } else {
+        print(requestStatus.message);
+        emit(RejectFriendRequestErrorState(
+          event.friendId,
+          requestStatus.errorCode,
+        ));
+      }
+    });
   }
 }

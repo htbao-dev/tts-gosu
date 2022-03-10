@@ -31,6 +31,9 @@ class SearchErrorState extends SearchState {
 }
 
 abstract class FriendRequestState extends SearchState {
+  static const alreadyFriendStatus = 2;
+  static const receiverStatus = 1;
+  static const senderStatus = 0;
   final String friendId;
   final int? friendStatus;
   FriendRequestState({required this.friendId, required this.friendStatus});
@@ -82,6 +85,25 @@ class AcceptFriendRequestSuccessState extends FriendRequestState {
 
 class AcceptFriendRequestErrorState extends FriendRequestState {
   AcceptFriendRequestErrorState(String friendId, int? friendStatus)
+      : super(friendId: friendId, friendStatus: friendStatus);
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
+}
+
+class RejectFriendRequestSuccessState extends FriendRequestState {
+  RejectFriendRequestSuccessState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
+}
+
+class RejectFriendRequestErrorState extends FriendRequestState {
+  RejectFriendRequestErrorState(String friendId, int? friendStatus)
       : super(friendId: friendId, friendStatus: friendStatus);
 
   @override

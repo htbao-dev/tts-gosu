@@ -35,22 +35,18 @@ class RoomPage extends StatelessWidget {
           }
           if (state is GetListRoomLoaded) {
             var rooms = state.listRoom;
-            return Row(children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: rooms.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        BlocProvider.of<RoomBloc>(context)
-                            .add(JoinRoomEvent(rooms[index]));
-                      },
-                      title: Text(rooms[index].name),
-                    );
+            return ListView.builder(
+              itemCount: rooms.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  onTap: () {
+                    BlocProvider.of<RoomBloc>(context)
+                        .add(JoinRoomEvent(rooms[index]));
                   },
-                ),
-              ),
-            ]);
+                  title: Text(rooms[index].name),
+                );
+              },
+            );
           }
           return Container();
         },

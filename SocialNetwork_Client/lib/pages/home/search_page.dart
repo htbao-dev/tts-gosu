@@ -73,9 +73,12 @@ class SearchPage extends StatelessWidget {
         // leading: CircleAvatar(
         //   backgroundImage: NetworkImage(user.avatarUrl),
         // ),
+
         title: Text(item.user.name),
         subtitle: Text(item.user.username),
-        trailing: _listViewTileTrailing(item.status, item.user.id, userId));
+        trailing: SizedBox(
+            width: 200,
+            child: _listViewTileTrailing(item.status, item.user.id, userId)));
   }
 
   Widget _listViewTileTrailing(
@@ -92,7 +95,7 @@ class SearchPage extends StatelessWidget {
           }
           if (friendStatus != null) {
             switch (friendStatus) {
-              case 0:
+              case FriendRequestState.senderStatus:
                 return TextButton.icon(
                     onPressed: () {
                       BlocProvider.of<SearchBloc>(context)
@@ -100,15 +103,34 @@ class SearchPage extends StatelessWidget {
                     },
                     icon: const Icon(Icons.person_add_disabled),
                     label: const Text("Huỷ yêu cầu"));
-              case 1:
-                return TextButton.icon(
-                    onPressed: () {
-                      BlocProvider.of<SearchBloc>(context)
-                          .add(AcceptFriendRequestEvent(friendId));
-                    },
-                    icon: const Icon(Icons.person_add_alt),
-                    label: const Text("Xác nhận"));
-              case 2:
+              case FriendRequestState.receiverStatus:
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.yellow),
+                        ),
+                        onPressed: () {
+                          BlocProvider.of<SearchBloc>(context)
+                              .add(AcceptFriendRequestEvent(friendId));
+                        },
+                        child: const Text("Xác nhận")),
+                    TextButton(
+                      onPressed: () {
+                        BlocProvider.of<SearchBloc>(context)
+                            .add(RejectFriendRequestEvent(friendId));
+                      },
+                      child: const Text("Huỷ"),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.grey[300]),
+                      ),
+                    ),
+                  ],
+                );
+              case FriendRequestState.alreadyFriendStatus:
                 return const Text("Bạn bè");
               // return TextButton.icon(
               //     onPressed: () {
