@@ -22,13 +22,18 @@ api.post(
 api.post(
   "/cancel-friend-request",
   [authMiddleware.verifyToken, friendMiddleware.checkExistsAndValid],
-
   userController.cancelFriendRequest
 );
+
 api.post(
-  "/remove-friend",
+  "/unfriend",
   [authMiddleware.verifyToken, friendMiddleware.checkExistsAndValid],
-  userController.removeFriend
+  userController.unfriend
+);
+api.get(
+  "/get-list-friend",
+  [authMiddleware.verifyToken],
+  userController.getListFriend
 );
 
 module.exports = api;

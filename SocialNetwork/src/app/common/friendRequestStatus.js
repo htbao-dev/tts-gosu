@@ -38,6 +38,10 @@ const acceptFriendRequestSuccess = {
   message: "Accept friend request success",
 };
 
+const rejectFriendRequestSuccess = {
+  message: "Reject friend request success",
+};
+
 module.exports = {
   userNotFoundError,
   friendNotFoundError,
@@ -49,4 +53,5 @@ module.exports = {
   cancelFriendRequestSuccess,
   friendRequestSuccess,
   acceptFriendRequestSuccess,
+  rejectFriendRequestSuccess,
 };

@@ -33,4 +33,30 @@ class UserRepository {
       throw Exception(response.statusCode);
     }
   }
+
+  Future<List<UserWithFriendstatus>> getListFriend() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    final response =
+        await http.get(Uri.parse('$apiUrl/user/get-list-friend'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+    if (response.statusCode == 200) {
+      print(response.body);
+      List<UserWithFriendstatus> users =
+          userWithFriendshipFromJson(response.body);
+      return users;
+    } else if (response.statusCode == 403) {
+      final isOK = await _authRepo.refreshAccessToken();
+
+      if (isOK) {
+        return getListFriend();
+      } else {
+        throw RefreshTokenExpiredException("Refreshtoken expired");
+      }
+    } else {
+      throw Exception(response.statusCode);
+    }
+  }
 }

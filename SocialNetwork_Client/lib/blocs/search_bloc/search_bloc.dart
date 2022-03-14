@@ -35,6 +35,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             add(SearchErrorEvent(e.toString()));
           }
         });
+      } else {
+        emit(SearchEmptyState());
       }
     });
 
@@ -42,52 +44,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       // await Future.delayed(const Duration(milliseconds: 500));
       prefs ??= await SharedPreferences.getInstance();
       emit(SearchLoaded(event.users, prefs!.getString("userId") ?? ""));
-    });
-
-    on<SendFriendRequestEvent>(
-      (event, emit) async {
-        int? friendstatus;
-        var requestStatus = await friendRepo.sendFriendRequest(event.friendId);
-        if (requestStatus.errorCode == null) {
-          friendstatus = 0;
-          emit(SendFriendRequestSuccessState(event.friendId, friendstatus));
-        } else {
-          print(requestStatus.message);
-          emit(SendFriendRequestErrorState(event.friendId, friendstatus));
-        }
-      },
-    );
-
-    on<CancelFriendRequestEvent>(
-      (event, emit) {
-        emit(CancelFriendRequestSuccessState(event.friendId, null));
-      },
-    );
-
-    on<AcceptFriendRequestEvent>((event, emit) async {
-      var requestStatus = await friendRepo.acceptFriendRequest(event.friendId);
-      if (requestStatus.errorCode == null) {
-        emit(AcceptFriendRequestSuccessState(event.friendId, 2));
-      } else {
-        print(requestStatus.message);
-        emit(AcceptFriendRequestErrorState(
-          event.friendId,
-          requestStatus.errorCode,
-        ));
-      }
-    });
-
-    on<RejectFriendRequestEvent>((event, emit) async {
-      var requestStatus = await friendRepo.rejectFriendRequest(event.friendId);
-      if (requestStatus.errorCode == null) {
-        emit(RejectFriendRequestSuccessState(event.friendId, null));
-      } else {
-        print(requestStatus.message);
-        emit(RejectFriendRequestErrorState(
-          event.friendId,
-          requestStatus.errorCode,
-        ));
-      }
     });
   }
 }

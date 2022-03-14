@@ -5,9 +5,12 @@ import 'dart:convert';
 List<User> userFromJson(String str) =>
     List<User>.from(json.decode(str)['users'].map((x) => User.fromJson(x)));
 
-List<UserWithFriendstatus> userWithFriendshipFromJson(String str) =>
-    List<UserWithFriendstatus>.from(
-        json.decode(str).map((x) => UserWithFriendstatus.fromJson(x)));
+List<UserWithFriendstatus> userWithFriendshipFromJson(String str) {
+  var jsonData = json.decode(str);
+  print(jsonData);
+  return List<UserWithFriendstatus>.from(
+      jsonData.map((x) => UserWithFriendstatus.fromJson(x)));
+}
 
 class User {
   String id;
@@ -28,11 +31,7 @@ class UserWithFriendstatus {
   UserWithFriendstatus({required this.user, this.status});
 
   factory UserWithFriendstatus.fromJson(Map<String, dynamic> json) {
-    User user = User.fromJson({
-      "id": json["id"] ?? json["_id"],
-      "name": json["name"],
-      "username": json["username"],
-    });
+    User user = User.fromJson(json['user']);
     return UserWithFriendstatus(user: user, status: json['status']);
   }
 }

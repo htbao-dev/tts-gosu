@@ -54,13 +54,17 @@ async function searchUserByName(req, res) {
     },
     {
       $project: {
-        _id: 1,
-        username: 1,
-        name: 1,
+        _id: 0,
         status: 1,
+        user: {
+          _id: "$_id",
+          username: "$username",
+          name: "$name",
+        },
       },
     },
   ]);
+  console.log(result);
   res.status(200).json(result);
 }
 
@@ -113,8 +117,7 @@ async function acceptFriendRequest(req, res) {
   }
   const _user = checkExistsInListFriend(friend.friends, userId);
   if (!_user) {
-    user.friends.pull({ user: friendId });
-    await user.save();
+    removeFromListFriendOf(userId, friendId);
     return res
       .status(400)
       .json(friendRequestStatus.notFriendReqeustReceiverError);
@@ -133,16 +136,6 @@ async function acceptFriendRequest(req, res) {
         { _id: friendId, "friends.user": userId },
         { $set: { "friends.$.status": 2 } }
       );
-      // user.friends.findOneAndUpdate(
-      //   { user: friendId },
-      //   { $set: { status: 2 } }
-      // );
-      // friend.friends.findOneAndUpdate(
-      //   { user: userId },
-      //   { $set: { status: 2 } }
-      // );
-      // await user.save();
-      // await friend.save();
       const friendSocketId = friend.socketId;
       if (friendSocketId) {
         io.to(friendSocketId).emit("accept-friend-request", {
@@ -165,40 +158,44 @@ async function rejectFriendRequest(req, res) {
     return res
       .status(400)
       .json(friendRequestStatus.friendRequestNotExistsError);
-  }
-  switch (_friend.status) {
-    case 2:
-      return res.status(400).json(friendRequestStatus.alreadyFriendError);
-    case 0:
-      return res
-        .status(400)
-        .json(friendRequestStatus.notFriendReqeustReceiverError);
-    case 1: {
-      const _user = checkExistsInListFriend(friend.friends, userId);
-      if (!_user) {
-        user.friends.pull({ user: friendId });
-        await user.save();
+  } else {
+    switch (_friend.status) {
+      case 2:
+        return res.status(400).json(friendRequestStatus.alreadyFriendError);
+      case 0:
         return res
           .status(400)
           .json(friendRequestStatus.notFriendReqeustReceiverError);
-      }
-      switch (_user.status) {
-        case 2:
-          return res.status(400).json(friendRequestStatus.alreadyFriendError);
-        case 1:
-          friend.friends.pull({ user: userId });
-          user.friends.pull({ user: friendId });
-          await user.save();
-          await friend.save();
+      default: {
+        const _user = checkExistsInListFriend(friend.friends, userId);
+        if (!_user) {
+          removeFromListFriendOf(userId, friendId);
           return res
             .status(400)
             .json(friendRequestStatus.notFriendReqeustReceiverError);
-        case 0:
-          user.friends.pull({ user: friendId });
-          await user.save();
-          return res
-            .status(200)
-            .json(friendRequestStatus.rejectFriendRequestSuccess);
+        } else {
+          switch (_user.status) {
+            case 2:
+              return res
+                .status(400)
+                .json(friendRequestStatus.alreadyFriendError);
+            case 1: {
+              removeFromListFriendOf(userId, friendId);
+              removeFromListFriendOf(friendId, userId);
+              return res
+                .status(400)
+                .json(friendRequestStatus.notFriendReqeustReceiverError);
+            }
+            case 0: {
+              console.log(`userid ${userId} friendid ${friendId}`);
+              removeFromListFriendOf(userId, friendId);
+              removeFromListFriendOf(friendId, userId);
+              return res
+                .status(200)
+                .json(friendRequestStatus.rejectFriendRequestSuccess);
+            }
+          }
+        }
       }
     }
   }
@@ -227,8 +224,7 @@ async function cancelFriendRequest(req, res) {
       case 0: {
         const _user = checkExistsInListFriend(friend.friends, userId);
         if (!_user) {
-          user.friends.pull({ user: friendId });
-          await user.save();
+          removeFromListFriendOf(userId, friendId);
           return res
             .status(400)
             .json(friendRequestStatus.notFriendReqeustReceiverError);
@@ -239,10 +235,8 @@ async function cancelFriendRequest(req, res) {
                 .status(400)
                 .json(friendRequestStatus.notFriendRequesterError);
             default: {
-              user.friends.pull({ user: friendId });
-              friend.friends.pull({ user: userId });
-              await user.save();
-              await friend.save();
+              removeFromListFriendOf(userId, friendId);
+              removeFromListFriendOf(friendId, userId);
               return res
                 .status(200)
                 .json(friendRequestStatus.cancelFriendRequestSuccess);
@@ -254,8 +248,53 @@ async function cancelFriendRequest(req, res) {
   }
 }
 
-async function removeFriend(req, res) {}
-// }
+async function unfriend(req, res) {}
+
+async function getListFriend(req, res) {
+  const userId = req.userId;
+  let listFriend = await User.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(userId) },
+    },
+    {
+      $sort: {
+        friends: -1,
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "friends.user",
+        foreignField: "_id",
+        as: "friends",
+      },
+    },
+    {
+      $project: {
+        friends: 1,
+        _id: 0,
+      },
+    },
+  ]);
+  // listFriend[0].friends.populate("user", "name username _id");
+  console.log(listFriend[0].friends[0].status);
+  res.status(200).json(listFriend[0]);
+}
+
+async function removeFromListFriendOf(userId, friendId) {
+  await User.updateOne(
+    {
+      _id: userId,
+    },
+    {
+      $pull: {
+        friends: {
+          user: friendId,
+        },
+      },
+    }
+  );
+}
 
 function checkExistsInListFriend(friends, friendId) {
   const exsits = (fr) => fr.user.toString() === friendId;
@@ -268,5 +307,6 @@ module.exports = {
   acceptFriendRequest,
   rejectFriendRequest,
   cancelFriendRequest,
-  removeFriend,
+  unfriend,
+  getListFriend,
 };

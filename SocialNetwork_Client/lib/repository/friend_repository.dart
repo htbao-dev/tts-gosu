@@ -94,7 +94,7 @@ class FriendRepository {
     }
   }
 
-  Future<FriendRequestStatus> rejectFriendRequest(String friendID) async {
+  Future<FriendRequestStatus> rejectFriendRequest(String friendId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
     final response = await http
@@ -102,13 +102,13 @@ class FriendRepository {
       // 'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     }, body: {
-      'friendId': friendID,
+      'friendId': friendId,
     });
     if (response.statusCode == 403) {
       final isOK = await _authRepo.refreshAccessToken();
 
       if (isOK) {
-        return rejectFriendRequest(friendID);
+        return rejectFriendRequest(friendId);
       } else {
         throw RefreshTokenExpiredException("Refreshtoken expired");
       }
@@ -118,6 +118,7 @@ class FriendRepository {
         FriendRequestStatus status = FriendRequestStatus.fromJson(body);
         return status;
       } catch (_) {
+        print(_.toString());
         throw Exception(response.body);
       }
     }

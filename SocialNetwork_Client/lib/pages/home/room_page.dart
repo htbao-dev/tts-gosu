@@ -23,11 +23,11 @@ class RoomPage extends StatelessWidget {
             Navigator.pushNamed(context, ChatPage.routeName,
                 arguments: state.room);
           }
-        },
-        builder: (context, state) {
           if (state is RoomInitial) {
             BlocProvider.of<RoomBloc>(context).add(GetListRoomEvent(""));
           }
+        },
+        builder: (context, state) {
           if (state is GetListRoomLoading) {
             return const Center(
               child: CircularProgressIndicator(),
