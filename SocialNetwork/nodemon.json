@@ -1,0 +1,6 @@
+{
+    "events": {
+      "crash": "kill-port 3483"
+    },
+    "delay": "1500"
+}
