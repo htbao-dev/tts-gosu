@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network_client/blocs/room_bloc/room_bloc.dart';
 import 'package:social_network_client/pages/home/chat_page.dart';
-import 'package:social_network_client/repository/room_repository.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({

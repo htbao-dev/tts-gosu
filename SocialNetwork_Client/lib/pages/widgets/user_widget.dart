@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network_client/blocs/contact_bloc/contact_bloc.dart';
 import 'package:social_network_client/blocs/friend_bloc/friend_bloc.dart';
-import 'package:social_network_client/blocs/room_bloc/room_bloc.dart';
-import 'package:social_network_client/models/room.dart';
 import 'package:social_network_client/models/user.dart';
 import 'package:social_network_client/repository/friend_repository.dart';
 

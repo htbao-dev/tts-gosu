@@ -4,8 +4,6 @@ import 'package:social_network_client/blocs/contact_bloc/contact_bloc.dart';
 import 'package:social_network_client/blocs/room_bloc/room_bloc.dart';
 import 'package:social_network_client/pages/home/chat_page.dart';
 import 'package:social_network_client/pages/widgets/user_widget.dart';
-import 'package:social_network_client/repository/room_repository.dart';
-import 'package:social_network_client/repository/user_repository.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({Key? key}) : super(key: key);
