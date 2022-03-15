@@ -99,3 +99,22 @@ class RejectFriendRequestErrorState extends FriendState {
   @override
   List<Object?> get props => [friendId, friendStatus];
 }
+
+class UnfriendSuccessState extends FriendState {
+  const UnfriendSuccessState(friendId, friendStatus)
+      : super(
+          friendId: friendId,
+          friendStatus: friendStatus,
+        );
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
+}
+
+class UnfriendErrorState extends FriendState {
+  const UnfriendErrorState(String friendId, int? friendStatus)
+      : super(friendId: friendId, friendStatus: friendStatus);
+
+  @override
+  List<Object?> get props => [friendId, friendStatus];
+}

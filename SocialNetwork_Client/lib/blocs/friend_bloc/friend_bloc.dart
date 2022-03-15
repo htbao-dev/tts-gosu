@@ -64,5 +64,17 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
         ));
       }
     });
+
+    on<UnfriendEvent>(
+      (event, emit) async {
+        var requestStatus = await friendRepo.unfriend(event.friendId);
+        if (requestStatus.errorCode == null) {
+          emit(UnfriendSuccessState(event.friendId, null));
+        } else {
+          print(requestStatus.message);
+          emit(UnfriendErrorState(event.friendId, requestStatus.errorCode));
+        }
+      },
+    );
   }
 }

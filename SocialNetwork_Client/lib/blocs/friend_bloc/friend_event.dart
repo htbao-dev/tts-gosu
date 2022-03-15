@@ -34,3 +34,10 @@ class RejectFriendRequestEvent extends FriendEvent {
   @override
   List<Object> get props => [friendId];
 }
+
+class UnfriendEvent extends FriendEvent {
+  const UnfriendEvent(friendId) : super(friendId);
+
+  @override
+  List<Object> get props => [friendId];
+}
