@@ -9,7 +9,7 @@ import 'package:social_network_client/models/user.dart';
 //       jsonData["rooms"].map((x) => RoomDetail.fromJson(x)));
 // }
 
-List<Room> roomFromJson(String str) {
+List<Room> roomsFromJson(String str) {
   final jsonData = json.decode(str);
   return List<Room>.from(jsonData.map((x) => Room.fromJson(x)));
 }

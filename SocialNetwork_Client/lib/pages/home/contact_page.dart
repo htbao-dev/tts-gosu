@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network_client/blocs/contact_bloc/contact_bloc.dart';
+import 'package:social_network_client/blocs/room_bloc/room_bloc.dart';
+import 'package:social_network_client/pages/home/chat_page.dart';
 import 'package:social_network_client/pages/widgets/user_widget.dart';
+import 'package:social_network_client/repository/room_repository.dart';
 import 'package:social_network_client/repository/user_repository.dart';
 
 class ContactPage extends StatelessWidget {
@@ -9,11 +12,20 @@ class ContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          ContactBloc(userRepo: RepositoryProvider.of<UserRepository>(context)),
-      child: BlocConsumer<ContactBloc, ContactState>(
-        listener: (context, state) {},
+    return BlocListener<RoomBloc, RoomState>(
+      listenWhen: (previous, current) => current is JoinRoomState,
+      listener: (context, state) {
+        if (state is JoinRoomState) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ChatPage(
+                room: state.room,
+              ),
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<ContactBloc, ContactState>(
         builder: (context, state) {
           if (state is ContactInitial) {
             BlocProvider.of<ContactBloc>(context).add(LoadContactsEvent());

@@ -1,4 +1,4 @@
-// import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
@@ -22,7 +22,7 @@ class RoomRepository {
           'Authorization': 'Bearer $accessToken',
         });
     if (response.statusCode == 200) {
-      List<Room> rooms = roomFromJson(response.body);
+      List<Room> rooms = roomsFromJson(response.body);
       return rooms;
     } else if (response.statusCode == 403) {
       final isOK = await _authRepo.refreshAccessToken();
@@ -136,5 +136,31 @@ class RoomRepository {
     }
 
     // request.files.add();
+  }
+
+  Future<Room> getInboxRoom(String contactId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    String? userId = prefs.getString('userId');
+    final response = await http.get(
+        Uri.parse('$apiUrl/room/get-inbox-room?contactId=$contactId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        });
+    if (response.statusCode == 200) {
+      Room room = Room.fromJson(json.decode(response.body));
+      return room;
+    } else if (response.statusCode == 403) {
+      final isOK = await _authRepo.refreshAccessToken();
+
+      if (isOK) {
+        return getInboxRoom(contactId);
+      } else {
+        throw RefreshTokenExpiredException("Refreshtoken expired");
+      }
+    } else {
+      throw Exception(response.statusCode);
+    }
   }
 }

@@ -64,14 +64,14 @@ async function searchUserByName(req, res) {
       },
     },
   ]);
-  console.log(result);
+  // console.log(result);
   res.status(200).json(result);
 }
 
 async function sendFriendRequest(req, res) {
   const userId = req.userId;
   const friendId = req.body.friendId;
-  const io = Common.io;
+  let io = Common.io;
   let user = await User.findById(userId);
   let friend = await User.findById(friendId);
   if (checkExistsInListFriend(user.friends, friendId)) {
@@ -86,7 +86,7 @@ async function sendFriendRequest(req, res) {
   await friend.save();
   const friendSocketId = friend.socketId;
   if (friendSocketId) {
-    io.to(friendSocketId).emit("recieve-friend-request", {
+    Common.io.to(friendSocketId).emit("recieve-friend-request", {
       userId: userId,
       name: user.name,
     });
@@ -138,7 +138,7 @@ async function acceptFriendRequest(req, res) {
       );
       const friendSocketId = friend.socketId;
       if (friendSocketId) {
-        io.to(friendSocketId).emit("accept-friend-request", {
+        Common.io.to(friendSocketId).emit("accept-friend-request", {
           userId: userId,
           name: user.name,
         });
@@ -187,7 +187,7 @@ async function rejectFriendRequest(req, res) {
                 .json(friendRequestStatus.notFriendReqeustReceiverError);
             }
             case 0: {
-              console.log(`userid ${userId} friendid ${friendId}`);
+              // console.log(`userid ${userId} friendid ${friendId}`);
               removeFromListFriendOf(userId, friendId);
               removeFromListFriendOf(friendId, userId);
               return res
@@ -248,37 +248,27 @@ async function cancelFriendRequest(req, res) {
   }
 }
 
-async function unfriend(req, res) {}
+async function unfriend(req, res) {
+  const userId = req.userId;
+  const friendId = req.body.friendId;
+
+  removeFromListFriendOf(userId, friendId);
+  removeFromListFriendOf(friendId, userId);
+  res.status(200).json(friendRequestStatus.unfriendSuccess);
+}
 
 async function getListFriend(req, res) {
   const userId = req.userId;
-  let listFriend = await User.aggregate([
-    {
-      $match: { _id: mongoose.Types.ObjectId(userId) },
-    },
-    {
-      $sort: {
-        friends: -1,
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "friends.user",
-        foreignField: "_id",
-        as: "friends",
-      },
-    },
-    {
-      $project: {
-        friends: 1,
-        _id: 0,
-      },
-    },
-  ]);
-  // listFriend[0].friends.populate("user", "name username _id");
-  console.log(listFriend[0].friends[0].status);
-  res.status(200).json(listFriend[0]);
+
+  let result = await User.findById({
+    _id: userId,
+  })
+    .select("friends")
+    .populate({
+      path: "friends.user",
+      select: "name username",
+    });
+  res.status(200).json(result.friends);
 }
 
 async function removeFromListFriendOf(userId, friendId) {

@@ -7,7 +7,6 @@ List<User> userFromJson(String str) =>
 
 List<UserWithFriendstatus> userWithFriendshipFromJson(String str) {
   var jsonData = json.decode(str);
-  print(jsonData);
   return List<UserWithFriendstatus>.from(
       jsonData.map((x) => UserWithFriendstatus.fromJson(x)));
 }

@@ -7,7 +7,7 @@ module.exports = (io, client) => {
     Room.findById(roomId).then((room) => {
       if (room) {
         const data = {
-          senderId: senderId,
+          sender: senderId,
           message: message,
           date: new Date(),
         };

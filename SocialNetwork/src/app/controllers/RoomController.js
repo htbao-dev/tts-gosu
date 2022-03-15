@@ -62,6 +62,42 @@ class RoomController {
     }
   }
 
+  async getInboxRoom(req, res) {
+    const contactId = req.query.contactId;
+    const userId = req.userId;
+    try {
+      const rooms = await Room.find(
+        {
+          members: {
+            $all: [
+              mongoose.Types.ObjectId(userId),
+              mongoose.Types.ObjectId(contactId),
+            ],
+            $size: 2,
+          },
+        },
+        {
+          _id: 1,
+          name: 1,
+        }
+      );
+      if (rooms.length === 0) {
+        const newRoom = new Room({
+          members: [
+            mongoose.Types.ObjectId(userId),
+            mongoose.Types.ObjectId(contactId),
+          ],
+        });
+        await newRoom.save();
+        return res.status(200).send(newRoom);
+      }
+      return res.status(200).send(rooms[0]);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(err);
+    }
+  }
+
   async getRoomDetail(req, res, next) {
     const roomId = req.query.roomId;
     try {

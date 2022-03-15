@@ -43,7 +43,6 @@ class UserRepository {
       'Authorization': 'Bearer $accessToken',
     });
     if (response.statusCode == 200) {
-      print(response.body);
       List<UserWithFriendstatus> users =
           userWithFriendshipFromJson(response.body);
       return users;

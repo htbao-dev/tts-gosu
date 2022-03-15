@@ -33,7 +33,7 @@ class Message {
     return Message(
       roomId: json["roomId"],
       id: json["id"] ?? json["_id"],
-      senderId: json["senderId"],
+      senderId: json["senderId"] ?? json['sender'],
       message: json["message"],
       images: imagesList,
       date: DateTime.parse(json["date"].toString()),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_network_client/blocs/friend_bloc/friend_bloc.dart';
+import 'package:social_network_client/blocs/contact_bloc/contact_bloc.dart';
 import 'package:social_network_client/blocs/nav_bloc/nav_bloc.dart';
+import 'package:social_network_client/blocs/room_bloc/room_bloc.dart';
 import 'package:social_network_client/models/room.dart';
 import 'package:social_network_client/pages/home/chat_page.dart';
 import 'package:social_network_client/pages/home/home_page.dart';
@@ -34,9 +35,16 @@ class HomeNavigator extends StatelessWidget {
             create: (context) => NavBloc(),
           ),
           BlocProvider(
-            create: (context) => FriendBloc(
-                friendRepo: RepositoryProvider.of<FriendRepository>(context)),
+            create: (context) => RoomBloc(
+              roomRepo: RepositoryProvider.of<RoomRepository>(context),
+            ),
           ),
+          BlocProvider(
+            create: (context) => ContactBloc(
+                userRepo: RepositoryProvider.of<UserRepository>(context),
+                roomRepo: RepositoryProvider.of<RoomRepository>(context),
+                roomBloc: BlocProvider.of<RoomBloc>(context)),
+          )
         ],
         child: WillPopScope(
           onWillPop: () async {
